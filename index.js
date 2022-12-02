@@ -1,26 +1,26 @@
 const express = require('express');
+const app = express();
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const port = 5000;
-const app = express();
 const db = mongoose.connection;
 var path = require('path');
 
 app.use(session({ secret:'batata' }));
-app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended:true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
-app.use(bodyParser.urlencoded({extended:true}));
 
 db.on('error', (err)=> console.log(err));
 db.once('open', ()=> console.log('Banco de dados conectado'));
 
 // Função para tratamento de dados provindos do front e busca no banco de dados
-app.post('/', (req, res)=> {
+app.post('/login', (req, res)=> {
     try{
-        let login = req.body.login;
-        let senha = req.body.senha;
+        var login = req.body.login;
+        var senha = req.body.senha;
 
         mongoose.connect('mongodb://127.0.0.1/teste', function(err, db){
             if(err){
@@ -30,10 +30,11 @@ app.post('/', (req, res)=> {
                 if(err){
                     throw err;
                 }
-                let count = Object.keys(result).length;
-                let i = 0;
+                console.log(result);
+                var count = Object.keys(result).length;
+                var i = 0;
 
-                for(i; i < count; i++){
+                for(i = 0; i < count; i++){
                     nomeUsuario = result[i].name;
                     senhaUsuario = result[i].senha;
                     
@@ -44,10 +45,9 @@ app.post('/', (req, res)=> {
                         res.render('formulario');
                     }
                     break;
-                    }
-                });
+                }
             });
-
+        });
     }catch(err) {
         res.send('Ocorreu um erro na autenticação');
     }
