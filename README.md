@@ -1,6 +1,6 @@
 # LoginNodeJS
  
-> Formulário de autenticação de usuário utilizando NodeJS e MongoDB (Banco de dados local). 
+> Sistema de autenticação de usuário utilizando NodeJS e MongoDB (Banco de dados local) e Sistema de autenticação utilizando NodeJS e JSON.
 
 ### Imagem: 
 
