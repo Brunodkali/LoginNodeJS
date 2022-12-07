@@ -7,11 +7,11 @@ const port = 3000;
 const db = mongoose.connection;
 const path = require('path');
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/views'));
 app.use(session({ secret:'batata' }));
 app.use(bodyParser.urlencoded({ extended:true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/views'));
 
 db.on('error', (err) => console.log(err));
 db.once('open', () => console.log('Banco de dados conectado'));
@@ -28,23 +28,25 @@ app.post('/login', (req, res)=> {
             }
             let users = await db.collection('usuarios').find().toArray();
             
-            for(let i in users) {
-                let nomeUsuario = users[i].name;
-                let senhaUsuario = users[i].senha;
+            try {
+                for(let i = 0; i < users.length; i++) {
+                    let nomeUsuario = users[i].name;
+                    let senhaUsuario = users[i].senha;
                 
-                try {
-                    if(nomeUsuario == login && senhaUsuario == senha){
-                        res.status(200).json({ Mensagem: 'Você está logado' });
-                    }else {
-                        i++
+                    if(login == nomeUsuario && senha == senhaUsuario){
+                        return res.status(200).json({ Mensagem: 'Você está logado' });
                     }
-                }catch (err) {
-                    return err;
                 }
+                if (login != null || senha != null) {
+                    return res.status(401).redirect('/');
+                }
+            }catch(err) {
+                return err;
             }
+            
         });
     }catch(err) {
-        res.send('Ocorreu um erro na autenticação');
+        return res.send('Ocorreu um erro na autenticação');
     }
 });
 
